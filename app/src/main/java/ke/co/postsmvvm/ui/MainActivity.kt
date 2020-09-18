@@ -5,10 +5,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import ke.co.postsmvvm.R
 import ke.co.postsmvvm.repository.PostsRepository
 import ke.co.postsmvvm.viewmodel.PostsViewModel
 import ke.co.postsmvvm.viewmodel.PostsViewModelFactory
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     lateinit var postsViewModel: PostsViewModel
@@ -22,7 +24,11 @@ class MainActivity : AppCompatActivity() {
             ViewModelProvider(this, postsViewModelFactory).get(PostsViewModel::class.java)
         postsViewModel.getPosts()
         postsViewModel.postsLiveData.observe(this, Observer { posts ->
-            Toast.makeText(baseContext, "${posts.size} posts fetched", Toast.LENGTH_LONG).show()
+            val postsAdapter = PostsRvAdapter(posts)
+            rvPosts.apply {
+                layoutManager = LinearLayoutManager(baseContext)
+                adapter = postsAdapter
+            }
         })
 
         postsViewModel.postsFailedLiveData.observe(this, Observer { error ->
