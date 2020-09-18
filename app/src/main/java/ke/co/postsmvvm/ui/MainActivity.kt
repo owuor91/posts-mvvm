@@ -1,5 +1,7 @@
 package ke.co.postsmvvm.ui
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import ke.co.postsmvvm.R
+import ke.co.postsmvvm.models.Post
 import ke.co.postsmvvm.repository.PostsRepository
 import ke.co.postsmvvm.viewmodel.PostsViewModel
 import ke.co.postsmvvm.viewmodel.PostsViewModelFactory
@@ -22,18 +25,42 @@ class MainActivity : AppCompatActivity() {
         postsViewModelFactory = PostsViewModelFactory(PostsRepository())
         postsViewModel =
             ViewModelProvider(this, postsViewModelFactory).get(PostsViewModel::class.java)
-        postsViewModel.getPosts()
+
+        postsViewModel.getDbPosts()
+    }
+
+    override fun onResume() {
+        super.onResume()
         postsViewModel.postsLiveData.observe(this, Observer { posts ->
-            val postsAdapter = PostsRvAdapter(posts)
-            rvPosts.apply {
-                layoutManager = LinearLayoutManager(baseContext)
-                adapter = postsAdapter
+            if (posts.isEmpty()) {
+                if (isConnected(baseContext)) {
+                    postsViewModel.getApiPosts()
+                }
+            } else {
+                displayPosts(posts)
             }
         })
 
         postsViewModel.postsFailedLiveData.observe(this, Observer { error ->
             Toast.makeText(baseContext, error, Toast.LENGTH_LONG).show()
         })
+    }
 
+    fun isConnected(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        if (networkInfo != null && networkInfo.isConnected) {
+            return true
+        }
+        return false
+    }
+
+    fun displayPosts(posts: List<Post>) {
+        val postsAdapter = PostsRvAdapter(posts)
+        rvPosts.apply {
+            layoutManager = LinearLayoutManager(baseContext)
+            adapter = postsAdapter
+        }
     }
 }
