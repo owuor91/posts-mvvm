@@ -8,7 +8,7 @@ import ke.co.postsmvvm.R
 import ke.co.postsmvvm.models.Post
 import kotlinx.android.synthetic.main.row_post_item.view.*
 
-class PostsRvAdapter(var postsList: List<Post>) :
+class PostsRvAdapter(var postsList: List<Post>, var postItemClickListener: PostItemClickListener) :
     RecyclerView.Adapter<PostsRvAdapter.PostsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostsViewHolder {
@@ -22,6 +22,9 @@ class PostsRvAdapter(var postsList: List<Post>) :
         holder.rowView.tvTitle.text = post.title
         holder.rowView.tvBody.text = post.body
         holder.rowView.tvUserId.text = post.userId.toString()
+        holder.rowView.setOnClickListener {
+            postItemClickListener.onItemClick(post)
+        }
     }
 
     override fun getItemCount(): Int {

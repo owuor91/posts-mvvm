@@ -15,7 +15,7 @@ import ke.co.postsmvvm.viewmodel.PostsViewModel
 import ke.co.postsmvvm.viewmodel.PostsViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PostItemClickListener {
     lateinit var postsViewModel: PostsViewModel
     lateinit var postsViewModelFactory: PostsViewModelFactory
 
@@ -57,10 +57,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun displayPosts(posts: List<Post>) {
-        val postsAdapter = PostsRvAdapter(posts)
+        val postsAdapter = PostsRvAdapter(posts, this)
         rvPosts.apply {
             layoutManager = LinearLayoutManager(baseContext)
             adapter = postsAdapter
         }
+    }
+
+    override fun onItemClick(post: Post) {
+        Toast.makeText(baseContext, post.title, Toast.LENGTH_LONG).show()
     }
 }
