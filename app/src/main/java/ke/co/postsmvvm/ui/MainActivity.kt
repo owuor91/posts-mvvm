@@ -19,16 +19,26 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         postsViewModelFactory = PostsViewModelFactory(PostsRepository())
         postsViewModel =
             ViewModelProvider(this, postsViewModelFactory).get(PostsViewModel::class.java)
-        postsViewModel.getPosts()
+
+
+        postsViewModel.getDbPosts()
+
         postsViewModel.postsLiveData.observe(this, Observer { posts ->
-            val postsAdapter = PostsRvAdapter(posts)
-            rvPosts.apply {
-                layoutManager = LinearLayoutManager(baseContext)
-                adapter = postsAdapter
+            if (posts.isEmpty()){
+                postsViewModel.getApiPosts()
             }
+            else{
+                val postsAdapter = PostsRvAdapter(posts)
+                rvPosts.apply {
+                    layoutManager = LinearLayoutManager(baseContext)
+                    adapter = postsAdapter
+                }
+            }
+
         })
 
         postsViewModel.postsFailedLiveData.observe(this, Observer { error ->
