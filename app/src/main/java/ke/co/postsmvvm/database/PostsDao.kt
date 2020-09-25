@@ -14,4 +14,7 @@ interface PostsDao {
 
     @Query("SELECT * FROM posts")
     fun getPosts(): LiveData<List<Post>>
+
+    @Query("SELECT * FROM posts WHERE id = :postId")
+    fun getPostById(postId: Int): LiveData<Post>
 }

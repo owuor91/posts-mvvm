@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 class PostsViewModel(val postsRepository: PostsRepository) : ViewModel() {
     lateinit var postsLiveData: LiveData<List<Post>>
     var postsFailedLiveData = MutableLiveData<String>()
+    lateinit var postByIdLiveData: LiveData<Post>
 
     fun getApiPosts() {
        viewModelScope.launch {
@@ -23,5 +24,9 @@ class PostsViewModel(val postsRepository: PostsRepository) : ViewModel() {
 
     fun getDbPosts(){
         postsLiveData = postsRepository.getDbPosts()
+    }
+
+    fun getPostById(postId: Int){
+        postByIdLiveData = postsRepository.getPostById(postId)
     }
 }

@@ -34,4 +34,9 @@ class PostsRepository() {
         val database = PostAppDatabase.getDbInstance(PostsApp.appContext)
         return database.postDao().getPosts()
     }
+
+    fun getPostById(postId: Int): LiveData<Post>{
+        val database = PostAppDatabase.getDbInstance(PostsApp.appContext)
+        return database.postDao().getPostById(postId)
+    }
 }
