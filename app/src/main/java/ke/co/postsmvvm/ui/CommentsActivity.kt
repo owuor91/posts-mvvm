@@ -1,5 +1,7 @@
 package ke.co.postsmvvm.ui
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -38,7 +40,7 @@ class CommentsActivity : AppCompatActivity() {
         commentsViewModel =
             ViewModelProvider(this, commentsViewModelFactory).get(CommentsViewModel::class.java)
 
-        commentsViewModel.getComments(postId)
+        commentsViewModel.getDbComments(postId)
     }
 
     override fun onResume() {
@@ -49,14 +51,37 @@ class CommentsActivity : AppCompatActivity() {
         })
 
         commentsViewModel.commentsLiveData.observe(this, Observer { commentsList ->
-            val commentsAdapter = CommentsAdapter(commentsList)
-            rvComments.layoutManager = LinearLayoutManager(this)
-            rvComments.adapter = commentsAdapter
+            if (commentsList.isEmpty()) {
+                if (isConnected()) {
+                    commentsViewModel.getApiComments(postId)
+                } else {
+                    Toast.makeText(
+                        baseContext,
+                        "Please connect to the Internet to proceed",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } else {
+                val commentsAdapter = CommentsAdapter(commentsList)
+                rvComments.layoutManager = LinearLayoutManager(this)
+                rvComments.adapter = commentsAdapter
+            }
         })
 
         commentsViewModel.commentsFailedLiveData.observe(this, Observer { errorMessage ->
             Toast.makeText(baseContext, errorMessage, Toast.LENGTH_SHORT).show()
         })
 
+    }
+
+    fun isConnected(): Boolean {
+        val connectivityManager =
+            baseContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        if (networkInfo != null && networkInfo.isConnected) {
+            return true
+        }
+        return false
     }
 }

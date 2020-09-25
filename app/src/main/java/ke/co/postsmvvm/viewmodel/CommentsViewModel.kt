@@ -1,5 +1,6 @@
 package ke.co.postsmvvm.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,19 +10,20 @@ import kotlinx.coroutines.launch
 
 
 class CommentsViewModel(val commentsRepository: CommentsRepository): ViewModel() {
-    var commentsLiveData = MutableLiveData<List<Comment>>()
+    lateinit var commentsLiveData: LiveData<List<Comment>>
     var commentsFailedLiveData = MutableLiveData<String>()
 
-    fun getComments(postId: Int){
+    fun getApiComments(postId: Int){
         viewModelScope.launch {
             val response = commentsRepository.getComments(postId)
-            if(response.isSuccessful){
-                commentsLiveData.postValue(response.body() as List<Comment>)
-            }
-            else{
+            if (!response.isSuccessful){
                 commentsFailedLiveData.postValue(response.errorBody()?.string())
             }
         }
+    }
+
+    fun getDbComments(postId: Int){
+        commentsLiveData = commentsRepository.getCommentsByPostId(postId)
     }
 
 }
