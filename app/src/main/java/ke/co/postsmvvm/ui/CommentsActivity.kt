@@ -28,6 +28,10 @@ class CommentsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_comments)
 
+        setSupportActionBar(toolbarComments)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         postId = intent.getIntExtra("POST_ID", 0)
 
         postsViewModelFactory = PostsViewModelFactory(PostsRepository())

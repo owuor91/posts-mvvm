@@ -54,4 +54,12 @@ class MainActivity : AppCompatActivity(), PostItemClickListener {
         intent.putExtra("POST_ID", post.id)
         startActivity(intent)
     }
+
+    override fun onResume() {
+        super.onResume()
+        fabTodos.setOnClickListener {
+            val intent = Intent(this, TodosActivity::class.java)
+            startActivity(intent)
+        }
+    }
 }
